@@ -4,9 +4,9 @@ Basic HOC that allows Vue js behave a more React way.
 **Table of Contents**
 
 - [Vue JS HOC helper](#)
-	- [Motivation](##Motivation)
-	- [Limitations](#)
-	- [Installation](#)
+	- [Motivation](#motivation)
+	- [Limitations](#limitations)
+	- [Installation](#installation)
 	- [Usage](#)
 	- [Features](#)
 	- [API](#)
