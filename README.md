@@ -22,11 +22,11 @@ Basic HOC that allows Vue js behave a more React way.
 
 ---
 ## Motivation
-My tasks are related to writing complicated visual components, which potentially have complicated relationships with one another. E.g. composable interfaces of product purchase that heavily implies polimorfism of some parts of the interface based on the product type and state.  
-Also I'm responsible for reliablity and performance of all these things.  
-I need to make code simple and have things under full control.
+My tasks are related to writing complicated visual components, which potentially have complicated relationships with one another. E.g. composable interface of product purchase that heavily implies polimorphism of some parts of the interface based on the product type and state.  
+Also I'm responsible for reliablity and performance of the application I'm working with.  
+I need to make code simple and have things under total control.
 
-Because I face vue js in production for some project I need to vuejs for mentioned purposes, so I decided to make it behave a more React way.
+Because I face vue js in production for the project I need to tune vuejs for mentioned purposes. So I decided to make it behave a more React way.
 
 ## Limitations
 This library is mostly useful when you use:
