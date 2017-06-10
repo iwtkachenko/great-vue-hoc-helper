@@ -7,17 +7,18 @@ Basic HOC that allows Vue js behave a more React way.
 	- [Motivation](#motivation)
 	- [Limitations](#limitations)
 	- [Installation](#installation)
-	- [Usage](#)
-	- [Features](#)
-	- [API](#)
-		- [hoc-helper](#)
-		- [Options](#)
-		- [RenderPayload](#)
-		- [RenderFunction](#)
-	- [Examples](#)
-		- [HOC that injects prop and its value](#)
-		- [HOC that injects some complex behavior](#)
-		- [Make a component from a function](#)
+	- [Usage](#usage)
+	- [Features](#features)
+	- [API](#api)
+		- [hoc-helper](#hoc-helper)
+		- [Options](#options)
+		- [RenderPayload](#renderpayload)
+		- [RenderFunction](#renderfunction)
+	- [Examples](#examples)
+		- [HOC that injects prop and its value](#hoc-that-injects-prop-and-its-value)
+		- [HOC that injects some complex behavior](#hoc-that-injects-some-complex-behavior)
+		- [Make a component from a function](#make-a-component-from-a-function)
+	- [License](#license)
 
 ---
 ## Motivation
@@ -203,6 +204,9 @@ const MyComp = combine({ props: { value: {} } })(
   (h, { self }) => { return <div>{self.value}</div>; },
 )
 ```
+
+## License
+This module is provided under the MIT License. You have to read LICENSE.md file for details.
 
 ---
 Copyright (c) 2017 by Igor Tkachenko <vash.igor@gmail.com>. All Rights Reserved.
