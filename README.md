@@ -1,6 +1,24 @@
 # Vue JS HOC helper
 Basic HOC that allows Vue js behave a more React way.
 
+**Table of Contents**
+
+- [Vue JS HOC helper](#)
+	- [Motivation](#)
+	- [Limitations](#)
+	- [Installation](#)
+	- [Usage](#)
+	- [Features](#)
+	- [API](#)
+		- [hoc-helper](#)
+		- [Options](#)
+		- [RenderPayload](#)
+		- [RenderFunction](#)
+	- [Examples](#)
+		- [HOC that injects prop and its value](#)
+		- [HOC that injects some complex behavior](#)
+		- [Make a component from a function](#)
+
 ---
 ## Motivation
 My tasks are related to writing complicated visual components, which potentially have complicated relationships with one another. E.g. composable interfaces of product purchase that heavily implies polimorfism of some parts of the interface based on the product type and state.  
