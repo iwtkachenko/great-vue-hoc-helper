@@ -3,7 +3,7 @@ Basic HOC that allows Vue js behave a more React way.
 
 ---
 ## Motivation
-My tasks are related to writing complicated visual components, that potentially have complicated relationships with one another. Like composable interfaces of product purchases that havily implies polimorfism of some parts of the interface based on the product type and state.  
+My tasks are related to writing complicated visual components, which potentially have complicated relationships with one another. E.g. composable interfaces of product purchase that heavily implies polimorfism of some parts of the interface based on the product type and state.  
 Also I'm responsible for reliablity and performance of all these things.  
 I need to make code simple and have things under full control.
 
