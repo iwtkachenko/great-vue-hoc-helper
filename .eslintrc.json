@@ -1,0 +1,15 @@
+{
+    "extends": [
+      "airbnb",
+      "plugin:flowtype/recommended"
+    ],
+    "plugins": [
+        "import",
+        "flowtype"
+    ],
+    "rules": {
+      "no-unused-vars": ["error", { "vars": "all", "args": "after-used", "argsIgnorePattern": "\\bh\\b" }],
+      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+      "react/react-in-jsx-scope": [0]
+    }
+}
