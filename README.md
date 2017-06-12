@@ -22,16 +22,20 @@ Basic HOC that allows Vue js behave a more React way.
 
 ---
 ## Motivation
-My tasks are related to writing complicated visual components, which potentially have complicated relationships with one another. E.g. composable interface of product purchase that heavily implies polimorphism of some parts of the interface based on the product type and state.  
-Also I'm responsible for reliablity and performance of the application I'm working with.  
-I need to make code simple and have things under total control.
+I see Vue js as a great library because it managed to combine multiple paradigms
+and approaches, that make it ideal field for experiments and studies.
+On the other hand I see React js as a best library for production projects,
+because it provides consistent, simple one-path fits all aproach for the project.
 
-Because I face vue js in production for the project I need to tune vuejs for mentioned purposes. So I decided to make it behave a more React way.
+And because I need to use VueJs in production, I'd like to make it behave more
+React way in my hands.
+Also I can't stand the temptation to use vuejs' great capabilities to experiment
+and learn.
 
 ## Limitations
 This library is mostly useful when you use:
 * vuejs with render functions
-* es6 modules to structure your porject 
+* es6 modules to structure your porject
 
 ## Installation
 
@@ -40,7 +44,7 @@ This library is mostly useful when you use:
 import Vue from 'vue';
 import compose from 'lodash.flowright';
 import helper from 'great-vue-hoc-helper';
-import Component from 'vue-class-component'; 
+import Component from 'vue-class-component';
 
 // Create HOC
 const Hoc = value => helper({
@@ -76,8 +80,8 @@ const FuncComp = helper({ props: { value: {} } })(
 ## API
 ### hoc-helper
 Signature of default import (helper itself)
-```javascript 
-(options: Options = {}) => (com: typeof Vue | RenderFunction) => typeof Vue 
+```javascript
+(options: Options = {}) => (com: typeof Vue | RenderFunction) => typeof Vue
 ```
 
 ### Options
@@ -190,8 +194,8 @@ const MyComp = compose(
   Incrementor(),
   Component())(
   class extends Vue {
-    render(h) { 
-      return <div>{this.value}</div>; 
+    render(h) {
+      return <div>{this.value}</div>;
     }
   }
 );
