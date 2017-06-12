@@ -51,12 +51,13 @@
     "flow-bin": "^0.47.0",
     "flow-typed": "^2.1.2",
     "html-webpack-plugin": "^2.28.0",
+    "lodash.flowright": "^3.5.0",
     "vue": "^2.3.4",
     "webpack": "^2.6.1",
-    "webpack-dev-server": "^2.4.5",
-    "lodash.flowright": "^3.5.0"
+    "webpack-dev-server": "^2.4.5"
   },
   "dependencies": {
+    "lodash.assign": "^4.2.0",
     "lodash.get": "^4.4.2",
     "vue-class-component": "^5.0.1"
   }
