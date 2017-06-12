@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "HOC creation helper for Vue.js used with JSX",
   "main": "dist/index.js",
-  "module": "module/index.js",
+  "module": "dist/index.js",
   "files": [
     "module/*",
     "dist/*"
