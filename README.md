@@ -22,12 +22,12 @@ Basic HOC that allows Vue js behave a more React way.
 
 ---
 ## Motivation
-I see Vue js as a great library because it managed to combine multiple paradigms
-and approaches, that make it ideal field for experiments and studies.
-On the other hand I see React js as a best library for production projects,
-because it provides consistent, simple one-path fits all aproach for the project.
+I see VueJs as a great library because it managed to combine multiple paradigms
+and approaches, that makes it ideal tool for experiments and studies.
+On the other hand I see ReactJs as the best library for production projects,
+because it provides consistent, simple one-path-fits-all aproach for the project.
 
-And because I need to use VueJs in production, I'd like to make it behave more
+Thus, because I need to use VueJs in production, I'd like to make it behave more
 React way in my hands.
 Also I can't stand the temptation to use vuejs' great capabilities to experiment
 and learn.
