@@ -1,6 +1,6 @@
 {
   "name": "great-vue-hoc-helper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "HOC creation helper for Vue.js used with JSX",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -13,7 +13,9 @@
     "url": "https://github.com/vashigor/great-vue-hoc-helper.git"
   },
   "keywords": [
-    "vue", "hoc", "jsx"
+    "vue",
+    "hoc",
+    "jsx"
   ],
   "author": "Igor Tkachenko",
   "license": "MIT",
