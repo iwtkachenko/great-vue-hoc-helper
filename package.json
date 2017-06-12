@@ -6,7 +6,7 @@
   "module": "module/index.js",
   "files": [
     "module/*",
-    "dist/*",
+    "dist/*"
   ],
   "repository": {
     "type": "git",
