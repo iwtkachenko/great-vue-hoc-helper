@@ -1,4 +1,26 @@
 {
+  "name": "great-vue-hoc-helper",
+  "version": "0.1.0",
+  "description": "HOC creation helper for Vue.js used with JSX",
+  "main": "dist/index.js",
+  "module": "module/index.js",
+  "files": [
+    "module/*",
+    "dist/*",
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vashigor/great-vue-hoc-helper.git"
+  },
+  "keywords": [
+    "vue", "hoc", "jsx"
+  ],
+  "author": "Igor Tkachenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vashigor/great-vue-hoc-helper/issues"
+  },
+  "homepage": "https://github.com/vashigor/great-vue-hoc-helper",
   "scripts": {
     "lint": "eslint ./",
     "start": "webpack-dev-server --config example.webpack.babel.js",
