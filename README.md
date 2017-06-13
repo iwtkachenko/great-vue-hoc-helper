@@ -39,6 +39,12 @@ This library is mostly useful when you use:
 
 ## Installation
 
+```bash
+npm install --save great-vue-hoc-helper
+# or
+yarn add great-vue-hoc-helper
+```
+
 ## Usage
 ```javascript
 import Vue from 'vue';
