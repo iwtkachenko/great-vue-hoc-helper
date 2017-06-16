@@ -4,8 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 // Copyright (c) 2017 by Igor Tkachenko <vash.igor@gmail.com>. All Rights Reserved.
@@ -28,17 +26,7 @@ var _lodash3 = require('lodash.assign');
 
 var _lodash4 = _interopRequireDefault(_lodash3);
 
-var _vueClassComponent = require('vue-class-component');
-
-var _vueClassComponent2 = _interopRequireDefault(_vueClassComponent);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -82,40 +70,30 @@ function destroyMetadata(self, options) {
 exports.default = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   return function (com) {
-    // We can transform some function to component instead of wrapping one.
-
     var mixins = options.options && options.options.mixins ? options.options.mixins : [];
+
+    // We can transform some function to component instead of wrapping one.
     if (!(com.name || com.options)) {
-      return (0, _vueClassComponent2.default)(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
+      return _vue2.default.extend(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
+
         name: 'great-func-com',
+
         props: options.props ? options.props : {},
+
         mixins: [].concat(_toConsumableArray(mixins), [{
           destroyed: function destroyed() {
             destroyMetadata(this, options);
           }
-        }])
-      }))(function (_Vue) {
-        _inherits(_class, _Vue);
+        }]),
 
-        function _class() {
-          _classCallCheck(this, _class);
-
-          return _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).apply(this, arguments));
+        render: function render(h) {
+          return com(h, _extends({
+            props: this.$props,
+            children: this.$children,
+            self: this
+          }, castMetadata(this, options)));
         }
-
-        _createClass(_class, [{
-          key: 'render',
-          value: function render(h) {
-            return com(h, _extends({
-              props: this.$props,
-              children: this.$children,
-              self: this
-            }, castMetadata(this, options)));
-          }
-        }]);
-
-        return _class;
-      }(_vue2.default));
+      }));
     }
 
     // This is a dangerous dirty hack - we change props option of the decorated component.
