@@ -58,7 +58,6 @@
   },
   "dependencies": {
     "lodash.assign": "^4.2.0",
-    "lodash.get": "^4.4.2",
-    "vue-class-component": "^5.0.1"
+    "lodash.get": "^4.4.2"
   }
 }

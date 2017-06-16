@@ -90,13 +90,15 @@ Signature of default import (helper itself)
 (options: Options = {}) => (com: typeof Vue | RenderFunction) => typeof Vue
 ```
 
+If you use metadata object, it is accessible in the HOC methods as `this.$hocMetadata`.
+
 ### Options
 ```javascript
 interface Options {
   // Inject props values into the child component
   injectProps?: (props: any, self?: any, options?: Options, metadata?: any) => any,
   // Prepare vue vm render data object
-  preapreData?: (self: any, options?: Options) => any,
+  prepareData?: (self: any, options?: Options) => any,
   // Additional props definitions
   props?: any,
   // If you want to render decorator rendere youself, you can use this property

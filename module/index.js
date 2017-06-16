@@ -11,8 +11,6 @@ import Vue from 'vue';
 import get from 'lodash.get';
 import assign from 'lodash.assign';
 
-import Component from 'vue-class-component';
-
 /**
  * Types that are used in the module.
  */
@@ -29,8 +27,12 @@ export interface Options {
   // Inject props values into the child component
   injectProps?: (props: any, self?: any, options?: Options, metadata?: any) => any,
   // Prepare vue vm render data object
-  preapreData?: (self: any, options?: Options) => any,
   prepareData?: (self: any, options?: Options) => any,
+  /**
+   * This property was missnamed and its support can be removed any time
+   * @deprecated
+   */
+  preapreData?: (self: any, options?: Options) => any,
   // Additional props definitions
   props?: any,
   // If you want to render decorator rendere youself, you can use this property
@@ -82,20 +84,23 @@ function destroyMetadata(self: any, options: Options) {
  * It can be used to transform a render function in a fullscale component.
  */
 export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => {
-  // We can transform some function to component instead of wrapping one.
+  const mixins = options.options && options.options.mixins ? options.options.mixins : []
 
-  const mixins = options.options ? options.options.mixins : []
+  // We can transform some function to component instead of wrapping one.
   if (!(com.name || com.options)) {
-    return Component({
+    return Vue.extend({
       ...get(options, 'options', {}),
+
       name: 'great-func-com',
+
       props: options.props ? options.props : {},
+
       mixins: [...mixins, {
         destroyed() {
           destroyMetadata(this, options);
         }
-      }]
-    })(class extends Vue {
+      }],
+
       render(h) {
         return com(h, {
           props: this.$props,
@@ -108,18 +113,29 @@ export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => 
   }
 
   // This is a dangerous dirty hack - we change props option of the decorated component.
+  com.options.props = com.options.props || {};
   assign(com.options.props, get(options, 'props', {}));
-  return Component({
+
+  return Vue.extend({
     ...get(options, 'options', {}),
+
     name: 'great-hoc',
+
     props: com.options.props,
+
     mixins: [...mixins, {
+      created() {
+        this.$hocMetadata = castMetadata(this, options).metadata;
+      },
+
       destroyed() {
         destroyMetadata(this, options);
       }
-    }]
-  })(class extends Vue {
+    }],
+
     render(h) {
+      const metadata = castMetadata(this, options).metadata || {};
+
       // Generete prop value
       const props = options.injectProps
         ? options.injectProps(this.$props, this, options, metadata)
@@ -135,7 +151,7 @@ export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => 
         children: this.$children,
         self: this,
         others,
-        ...castMetadata(this, options),
+        metadata,
       };
       if (options.render) {
         return options.render(h, payload);

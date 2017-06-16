@@ -24,6 +24,10 @@ var _lodash = require('lodash.get');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _lodash3 = require('lodash.assign');
+
+var _lodash4 = _interopRequireDefault(_lodash3);
+
 var _vueClassComponent = require('vue-class-component');
 
 var _vueClassComponent2 = _interopRequireDefault(_vueClassComponent);
@@ -80,7 +84,7 @@ exports.default = function () {
   return function (com) {
     // We can transform some function to component instead of wrapping one.
 
-    var mixins = options.options ? options.options.mixins : [];
+    var mixins = options.options && options.options.mixins ? options.options.mixins : [];
     if (!(com.name || com.options)) {
       return (0, _vueClassComponent2.default)(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
         name: 'great-func-com',
@@ -114,53 +118,49 @@ exports.default = function () {
       }(_vue2.default));
     }
 
-    // This is dangerous dirty hack - we change props option of the decorated component.
-    /* eslint-disable no-param-reassign */
-    com.options.props = _extends({}, com.options.props, (0, _lodash2.default)(options, 'props', {}));
-    /* eslint-enable no-param-reassign */
-    return (0, _vueClassComponent2.default)(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
+    // This is a dangerous dirty hack - we change props option of the decorated component.
+    com.options.props = com.options.props || {};
+    (0, _lodash4.default)(com.options.props, (0, _lodash2.default)(options, 'props', {}));
+
+    return _vue2.default.extend(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
+
       name: 'great-hoc',
+
       props: com.options.props,
+
       mixins: [].concat(_toConsumableArray(mixins), [{
+        created: function created() {
+          this.$hocMetadata = castMetadata(this, options).metadata;
+        },
         destroyed: function destroyed() {
           destroyMetadata(this, options);
         }
-      }])
-    }))(function (_Vue2) {
-      _inherits(_class2, _Vue2);
+      }]),
 
-      function _class2() {
-        _classCallCheck(this, _class2);
+      render: function render(h) {
+        var metadata = castMetadata(this, options).metadata || {};
 
-        return _possibleConstructorReturn(this, (_class2.__proto__ || Object.getPrototypeOf(_class2)).apply(this, arguments));
-      }
+        // Generete prop value
+        var props = options.injectProps ? options.injectProps(this.$props, this, options, metadata) : this.$props;
 
-      _createClass(_class2, [{
-        key: 'render',
-        value: function render(h) {
-          // Generete prop value
-          var props = options.injectProps ? options.injectProps(this.$props, this, options, metadata) : this.$props;
+        // Prepare component render data
+        var prepare = options.prepareData || options.preapreData;
+        var others = prepare ? prepare(this, options) : {};
 
-          // Prepare component render data
-          var prepare = options.prepareData || options.preapreData;
-          var others = prepare ? prepare(this, options) : {};
-
-          var payload = _extends({
-            com: com,
-            props: props,
-            children: this.$children,
-            self: this,
-            others: others
-          }, castMetadata(this, options));
-          if (options.render) {
-            return options.render(h, payload);
-          }
-
-          return h(com, _extends({ props: props }, others), this.$children);
+        var payload = {
+          com: com,
+          props: props,
+          children: this.$children,
+          self: this,
+          others: others,
+          metadata: metadata
+        };
+        if (options.render) {
+          return options.render(h, payload);
         }
-      }]);
 
-      return _class2;
-    }(_vue2.default));
+        return h(com, _extends({ props: props }, others), this.$children);
+      }
+    }));
   };
 };
