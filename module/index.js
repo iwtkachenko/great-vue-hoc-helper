@@ -29,6 +29,7 @@ export interface Options {
   injectProps?: (props: any, self?: any, options?: Options, metadata?: any) => any,
   // Prepare vue vm render data object
   preapreData?: (self: any, options?: Options) => any,
+  prepareData?: (self: any, options?: Options) => any,
   // Additional props definitions
   props?: any,
   // If you want to render decorator rendere youself, you can use this property
@@ -81,17 +82,19 @@ function destroyMetadata(self: any, options: Options) {
  */
 export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => {
   // We can transform some function to component instead of wrapping one.
+
+  const mixins = options.options ? options.options.mixins : []
   if (!(com.name || com.options)) {
     return Component({
       ...get(options, 'options', {}),
       name: 'great-func-com',
       props: options.props ? options.props : {},
+      mixins: [...mixins, {
+        destroyed() {
+          destroyMetadata(this, options);
+        }
+      }]
     })(class extends Vue {
-      // @TODO If we already have destroyed hook declared, this can create some issue.
-      destroyed() {
-        destroyMetadata(this, options);
-      }
-
       render(h) {
         return com(h, {
           props: this.$props,
@@ -111,12 +114,12 @@ export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => 
     ...get(options, 'options', {}),
     name: 'great-hoc',
     props: com.options.props,
+    mixins: [...mixins, {
+      destroyed() {
+        destroyMetadata(this, options);
+      }
+    }]
   })(class extends Vue {
-    // @TODO If we already have destroyed hook declared, this can create some issue.
-    destroyed() {
-      destroyMetadata(this, options);
-    }
-
     render(h) {
       // Generete prop value
       const props = options.injectProps
@@ -124,9 +127,8 @@ export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => 
         : this.$props;
 
       // Prepare component render data
-      const others = options.preapreData
-        ? options.preapreData(this, options)
-        : {};
+      const prepare = options.prepareData || options.preapreData
+      const others = prepare ? prepare(this, options) : {};
 
       const payload = {
         com,

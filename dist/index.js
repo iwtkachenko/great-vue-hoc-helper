@@ -36,6 +36,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 /**
  * Helper functions.
  */
@@ -77,10 +79,17 @@ exports.default = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   return function (com) {
     // We can transform some function to component instead of wrapping one.
+
+    var mixins = options.options ? options.options.mixins : [];
     if (!(com.name || com.options)) {
       return (0, _vueClassComponent2.default)(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
         name: 'great-func-com',
-        props: options.props ? options.props : {}
+        props: options.props ? options.props : {},
+        mixins: [].concat(_toConsumableArray(mixins), [{
+          destroyed: function destroyed() {
+            destroyMetadata(this, options);
+          }
+        }])
       }))(function (_Vue) {
         _inherits(_class, _Vue);
 
@@ -91,13 +100,6 @@ exports.default = function () {
         }
 
         _createClass(_class, [{
-          key: 'destroyed',
-
-          // @TODO If we already have destroyed hook declared, this can create some issue.
-          value: function destroyed() {
-            destroyMetadata(this, options);
-          }
-        }, {
           key: 'render',
           value: function render(h) {
             return com(h, _extends({
@@ -118,7 +120,12 @@ exports.default = function () {
     /* eslint-enable no-param-reassign */
     return (0, _vueClassComponent2.default)(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
       name: 'great-hoc',
-      props: com.options.props
+      props: com.options.props,
+      mixins: [].concat(_toConsumableArray(mixins), [{
+        destroyed: function destroyed() {
+          destroyMetadata(this, options);
+        }
+      }])
     }))(function (_Vue2) {
       _inherits(_class2, _Vue2);
 
@@ -129,20 +136,14 @@ exports.default = function () {
       }
 
       _createClass(_class2, [{
-        key: 'destroyed',
-
-        // @TODO If we already have destroyed hook declared, this can create some issue.
-        value: function destroyed() {
-          destroyMetadata(this, options);
-        }
-      }, {
         key: 'render',
         value: function render(h) {
           // Generete prop value
           var props = options.injectProps ? options.injectProps(this.$props, this, options, metadata) : this.$props;
 
           // Prepare component render data
-          var others = options.preapreData ? options.preapreData(this, options) : {};
+          var prepare = options.prepareData || options.preapreData;
+          var others = prepare ? prepare(this, options) : {};
 
           var payload = _extends({
             com: com,
