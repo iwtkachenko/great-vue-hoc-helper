@@ -9,6 +9,7 @@ import Vue from 'vue';
 /* eslint-enable import/no-extraneous-dependencies */
 
 import get from 'lodash.get';
+import assign from 'lodash.assign';
 
 import Component from 'vue-class-component';
 
@@ -106,10 +107,8 @@ export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => 
     });
   }
 
-  // This is dangerous dirty hack - we change props option of the decorated component.
-  /* eslint-disable no-param-reassign */
-  com.options.props = { ...com.options.props, ...get(options, 'props', {}) };
-  /* eslint-enable no-param-reassign */
+  // This is a dangerous dirty hack - we change props option of the decorated component.
+  assign(com.options.props, get(options, 'props', {}));
   return Component({
     ...get(options, 'options', {}),
     name: 'great-hoc',
