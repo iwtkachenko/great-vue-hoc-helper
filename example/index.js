@@ -14,7 +14,6 @@ import combine from '../module/index';
  * You don't need to declare this property into wrapped component.
  */
 const Injector = value => combine({
-  props: { value: {} },
   injectProps: props => ({ ...props, value }),
 });
 
@@ -33,7 +32,6 @@ const Incrementor = () => combine({
 
   render: (h, { com: Com, self, props, metadata }) => {
     const { addedValue, cached } = metadata;
-
     if (addedValue === null) {
       /* eslint-disable no-param-reassign */
       metadata.addedValue = 0;
@@ -71,8 +69,7 @@ const MyComp = compose(
   Incrementor(),
   // Transform function into vue component.
   combine())(
-  // We still can't use arrow body for vue's jsx.
-  (h, { self }) => { return <div>{self.value}</div>; },
+  (h, { self }) => (<div>{self.value}</div>),
 );
 /* eslint-enable arrow-body-style */
 

@@ -56,8 +56,12 @@ export type RenderFunction = (h: any, payload?: RenderPayload) => any
  * Helper functions.
  */
 const metadata = {};
-function castMetadata(self: any, options: Options): any {
+export function castMetadata(self: any, options: Options): any {
   /* eslint-disable no-underscore-dangle */
+  if (metadata[self._uid]) {
+    return { metadata: metadata[self._uid] };
+  }
+
   if (options.metadata) {
     if (!metadata[self._uid]) {
       metadata[self._uid] = { ...options.metadata };
@@ -78,28 +82,42 @@ function destroyMetadata(self: any, options: Options) {
   /* eslint-enable no-underscore-dangle */
 }
 
+function getPrepareOtherData(options: Options): (self: any) => any {
+  const prepare = options.prepareData || options.preapreData;
+  return prepare ? (self: any) => prepare(self, options) : () => ({});
+}
+
 /**
  * Module export.
  * Wrap function that simplifies HOC creation for VueJs.
  * It can be used to transform a render function in a fullscale component.
  */
 export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => {
-  const mixins = options.options && options.options.mixins ? options.options.mixins : []
+  const injectedOptions = get(options, 'options', {});
+
+  const mixins = [
+    ...(options.options && options.options.mixins ? options.options.mixins : []),
+    {
+      created() {
+        this.$hocMetadata = castMetadata(this, options).metadata;
+      },
+
+      destroyed() {
+        destroyMetadata(this, options);
+      },
+    },
+  ];
 
   // We can transform some function to component instead of wrapping one.
   if (!(com.name || com.options)) {
     return Vue.extend({
-      ...get(options, 'options', {}),
+      ...injectedOptions,
 
       name: 'great-func-com',
 
       props: options.props ? options.props : {},
 
-      mixins: [...mixins, {
-        destroyed() {
-          destroyMetadata(this, options);
-        }
-      }],
+      mixins,
 
       render(h) {
         return com(h, {
@@ -108,56 +126,46 @@ export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => 
           self: this,
           ...castMetadata(this, options),
         });
-      }
+      },
     });
   }
 
   // This is a dangerous dirty hack - we change props option of the decorated component.
-  com.options.props = com.options.props || {};
   assign(com.options.props, get(options, 'props', {}));
 
+  // Get function that prepare other component data object parameters for rendering
+  const prepare = getPrepareOtherData(options);
+
   return Vue.extend({
-    ...get(options, 'options', {}),
+    ...injectedOptions,
 
     name: 'great-hoc',
 
     props: com.options.props,
 
-    mixins: [...mixins, {
-      created() {
-        this.$hocMetadata = castMetadata(this, options).metadata;
-      },
-
-      destroyed() {
-        destroyMetadata(this, options);
-      }
-    }],
+    mixins,
 
     render(h) {
-      const metadata = castMetadata(this, options).metadata || {};
+      const hocMetadata = castMetadata(this, options).metadata || {};
 
       // Generete prop value
       const props = options.injectProps
-        ? options.injectProps(this.$props, this, options, metadata)
+        ? options.injectProps(this.$props, this, options, hocMetadata)
         : this.$props;
 
-      // Prepare component render data
-      const prepare = options.prepareData || options.preapreData
-      const others = prepare ? prepare(this, options) : {};
-
-      const payload = {
-        com,
-        props,
-        children: this.$children,
-        self: this,
-        others,
-        metadata,
-      };
+      const others = prepare(this);
       if (options.render) {
-        return options.render(h, payload);
+        return options.render(h, {
+          com,
+          props,
+          children: this.$children,
+          self: this,
+          others,
+          metadata: hocMetadata,
+        });
       }
 
       return h(com, { props, ...others }, this.$children);
-    }
+    },
   });
 };

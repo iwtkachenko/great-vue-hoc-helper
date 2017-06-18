@@ -14,6 +14,8 @@ Basic HOC that allows Vue js behave a more React way.
 		- [Options](#options)
 		- [RenderPayload](#renderpayload)
 		- [RenderFunction](#renderfunction)
+		- [Utility Functions](#utility-functions)
+			- [Cast component's metadata](#castmetadata)
 	- [Examples](#examples)
 		- [HOC that injects prop and its value](#hoc-that-injects-prop-and-its-value)
 		- [HOC that injects some complex behavior](#hoc-that-injects-some-complex-behavior)
@@ -70,8 +72,7 @@ const MyComp = compose(
 
 // Create a function component
 const FuncComp = helper({ props: { value: {} } })(
-  // We still can't use arrow body for vue's jsx.
-  (h, { self }) => { return <div>{self.value}</div>; },
+  (h, { self }) => (<div>{self.value}</div>),
 )
 ```
 
@@ -133,6 +134,14 @@ interface RenderPayload {
 ```javascript
 type RenderFunction = (h: any, payload?: RenderPayload) => any
 ```
+
+### Utility Functions
+
+#### castMetadata
+```javascript
+function castMetadata(self: VNode): { metadata: Object<Metadata> }
+```
+This function return metadata object for particular component intstance. It uses its uid to identify it. It should be component itself, if it's wrapped by HOC it won't work.
 
 ## Examples
 ### HOC that injects prop and its value
@@ -212,8 +221,7 @@ const MyComp = compose(
 ### Make a component from a function
 ```javascript
 const MyComp = combine({ props: { value: {} } })(
-  // We still can't use arrow body for vue's jsx.
-  (h, { self }) => { return <div>{self.value}</div>; },
+  (h, { self }) => (<div>{self.value}</div>),
 )
 ```
 

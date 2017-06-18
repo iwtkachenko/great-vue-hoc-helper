@@ -14,6 +14,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 /* eslint-enable import/no-extraneous-dependencies */
 
+exports.castMetadata = castMetadata;
+
 var _vue = require('vue');
 
 var _vue2 = _interopRequireDefault(_vue);
@@ -41,6 +43,10 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var metadata = {};
 function castMetadata(self, options) {
   /* eslint-disable no-underscore-dangle */
+  if (metadata[self._uid]) {
+    return { metadata: metadata[self._uid] };
+  }
+
   if (options.metadata) {
     if (!metadata[self._uid]) {
       metadata[self._uid] = _extends({}, options.metadata);
@@ -61,6 +67,15 @@ function destroyMetadata(self, options) {
   /* eslint-enable no-underscore-dangle */
 }
 
+function getPrepareOtherData(options) {
+  var prepare = options.prepareData || options.preapreData;
+  return prepare ? function (self) {
+    return prepare(self, options);
+  } : function () {
+    return {};
+  };
+}
+
 /**
  * Module export.
  * Wrap function that simplifies HOC creation for VueJs.
@@ -70,21 +85,26 @@ function destroyMetadata(self, options) {
 exports.default = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   return function (com) {
-    var mixins = options.options && options.options.mixins ? options.options.mixins : [];
+    var injectedOptions = (0, _lodash2.default)(options, 'options', {});
+
+    var mixins = [].concat(_toConsumableArray(options.options && options.options.mixins ? options.options.mixins : []), [{
+      created: function created() {
+        this.$hocMetadata = castMetadata(this, options).metadata;
+      },
+      destroyed: function destroyed() {
+        destroyMetadata(this, options);
+      }
+    }]);
 
     // We can transform some function to component instead of wrapping one.
     if (!(com.name || com.options)) {
-      return _vue2.default.extend(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
+      return _vue2.default.extend(_extends({}, injectedOptions, {
 
         name: 'great-func-com',
 
         props: options.props ? options.props : {},
 
-        mixins: [].concat(_toConsumableArray(mixins), [{
-          destroyed: function destroyed() {
-            destroyMetadata(this, options);
-          }
-        }]),
+        mixins: mixins,
 
         render: function render(h) {
           return com(h, _extends({
@@ -97,44 +117,35 @@ exports.default = function () {
     }
 
     // This is a dangerous dirty hack - we change props option of the decorated component.
-    com.options.props = com.options.props || {};
     (0, _lodash4.default)(com.options.props, (0, _lodash2.default)(options, 'props', {}));
 
-    return _vue2.default.extend(_extends({}, (0, _lodash2.default)(options, 'options', {}), {
+    // Get function that prepare other component data object parameters for rendering
+    var prepare = getPrepareOtherData(options);
+
+    return _vue2.default.extend(_extends({}, injectedOptions, {
 
       name: 'great-hoc',
 
       props: com.options.props,
 
-      mixins: [].concat(_toConsumableArray(mixins), [{
-        created: function created() {
-          this.$hocMetadata = castMetadata(this, options).metadata;
-        },
-        destroyed: function destroyed() {
-          destroyMetadata(this, options);
-        }
-      }]),
+      mixins: mixins,
 
       render: function render(h) {
-        var metadata = castMetadata(this, options).metadata || {};
+        var hocMetadata = castMetadata(this, options).metadata || {};
 
         // Generete prop value
-        var props = options.injectProps ? options.injectProps(this.$props, this, options, metadata) : this.$props;
+        var props = options.injectProps ? options.injectProps(this.$props, this, options, hocMetadata) : this.$props;
 
-        // Prepare component render data
-        var prepare = options.prepareData || options.preapreData;
-        var others = prepare ? prepare(this, options) : {};
-
-        var payload = {
-          com: com,
-          props: props,
-          children: this.$children,
-          self: this,
-          others: others,
-          metadata: metadata
-        };
+        var others = prepare(this);
         if (options.render) {
-          return options.render(h, payload);
+          return options.render(h, {
+            com: com,
+            props: props,
+            children: this.$children,
+            self: this,
+            others: others,
+            metadata: hocMetadata
+          });
         }
 
         return h(com, _extends({ props: props }, others), this.$children);
