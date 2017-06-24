@@ -15,6 +15,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /* eslint-enable import/no-extraneous-dependencies */
 
 exports.castMetadata = castMetadata;
+exports.destroyMetadata = destroyMetadata;
 
 var _vue = require('vue');
 
@@ -39,6 +40,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 /**
  * Types that are used in the module.
+ */
+
+
+/**
+ * @deprecated It's better to use another module to create components
+ * from functions.
  */
 var metadata = {};
 function castMetadata(self, options) {
@@ -79,7 +86,6 @@ function getPrepareOtherData(options) {
 /**
  * Module export.
  * Wrap function that simplifies HOC creation for VueJs.
- * It can be used to transform a render function in a fullscale component.
  */
 
 exports.default = function () {
@@ -96,8 +102,8 @@ exports.default = function () {
       }
     }]);
 
-    // We can transform some function to component instead of wrapping one.
     if (!(com.name || com.options)) {
+      console.warn('Despite this module supports conversion of functions to components ' + 'this functionality is deprecated and isn\'t developed.\n ' + 'Please, use the following module insead: ');
       return _vue2.default.extend(_extends({}, injectedOptions, {
 
         name: 'great-func-com',

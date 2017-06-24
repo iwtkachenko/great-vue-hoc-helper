@@ -9,17 +9,18 @@ Basic HOC that allows Vue js behave a more React way.
 	- [Installation](#installation)
 	- [Usage](#usage)
 	- [Features](#features)
+	- [Related Libraries](#relatedlibraries)
 	- [API](#api)
 		- [hoc-helper](#hoc-helper)
 		- [Options](#options)
 		- [RenderPayload](#renderpayload)
-		- [RenderFunction](#renderfunction)
+		- [RenderFunction (deprecated)](#renderfunction)
 		- [Utility Functions](#utility-functions)
 			- [Cast component's metadata](#castmetadata)
+			- [Destroy component's metadata](#destroymetadata)
 	- [Examples](#examples)
 		- [HOC that injects prop and its value](#hoc-that-injects-prop-and-its-value)
 		- [HOC that injects some complex behavior](#hoc-that-injects-some-complex-behavior)
-		- [Make a component from a function](#make-a-component-from-a-function)
 	- [License](#license)
 
 ---
@@ -69,20 +70,18 @@ const MyComp = compose(
     return <div>{this.value}</div>;
   }
 });
-
-// Create a function component
-const FuncComp = helper({ props: { value: {} } })(
-  (h, { self }) => (<div>{self.value}</div>),
-)
 ```
 
 
 ## Features
 * Allows to pass props from HOC to a wappred component without explicit declaration of them in the wrapped component.
 * Allows to use a single render function as a whole component.
-* Allows to use a single render function as a full-scale component.
+This is deprecated. Please use [this module](https://github.com/vashigor/great-vue-func-com)
 * Allows inject props' values into the wrapped components easially.
 * Allows to store some metadata, or data, or even functionality alongside the component instance without making vue js know about it.
+
+## Related Libraries
+* [Functional components createion](https://github.com/vashigor/great-vue-func-com)
 
 ## API
 ### hoc-helper
@@ -96,14 +95,14 @@ If you use metadata object, it is accessible in the HOC methods as `this.$hocMet
 ### Options
 ```javascript
 interface Options {
-  // Inject props values into the child component
-  injectProps?: (props: any, self?: any, options?: Options, metadata?: any) => any,
+	// Inject props values into the child component
+  injectProps?: (props: T, self?: Vue, options?: Options<T>, metadata?: any) => T,
   // Prepare vue vm render data object
-  prepareData?: (self: any, options?: Options) => any,
+  prepareData?: (self: Vue, options?: Options<T>) => any,
   // Additional props definitions
-  props?: any,
+  props?: T,
   // If you want to render decorator rendere youself, you can use this property
-  render?: (h: any, payload?: RenderPayload) => any,
+  render?: (h: any, payload?: RenderPayload<T>) => any,
   // This object has to have shape of Vue component options
   options?: any,
   /**
@@ -120,18 +119,21 @@ interface Options {
 
 ### RenderPayload
 ```javascript
-interface RenderPayload {
+interface RenderPayload<T> {
   com?: typeof Vue,
-  self: any,
-  props: any,
+  self: Vue,
+  props: T,
   others?: any,
-  children: any[],
+  children: Vue[],
   metadata?: any,
 }
 ```
 
 ### RenderFunction
 ```javascript
+/**
+ * @deprectated please use this module instead https://github.com/vashigor/great-vue-func-com
+ */
 type RenderFunction = (h: any, payload?: RenderPayload) => any
 ```
 
@@ -139,9 +141,17 @@ type RenderFunction = (h: any, payload?: RenderPayload) => any
 
 #### castMetadata
 ```javascript
-function castMetadata(self: VNode): { metadata: Object<Metadata> }
+function castMetadata<T>(self: Vue, options: Options<T>): { metadata: Object<Metadata> }
 ```
-This function return metadata object for particular component intstance. It uses its uid to identify it. It should be component itself, if it's wrapped by HOC it won't work.
+This function return metadata object for particular component intstance.
+It uses its uid to identify it. It should be component itself, if it's wrapped by HOC it won't work.
+
+### destroyMetadata
+```javascript
+function destroyMetadata(self: Vue): void
+```
+This function destroys metadata object of a particular component instance.
+
 
 ## Examples
 ### HOC that injects prop and its value
@@ -202,7 +212,6 @@ const Incrementor = () => combine({
 
 /**
  * Declare our component and wrap it with HOCs.
- * Notice that the component is just a function.
  */
 const MyComp = compose(
   // Set the initial value of property value to 3.
@@ -216,13 +225,6 @@ const MyComp = compose(
     }
   }
 );
-```
-
-### Make a component from a function
-```javascript
-const MyComp = combine({ props: { value: {} } })(
-  (h, { self }) => (<div>{self.value}</div>),
-)
 ```
 
 ## License

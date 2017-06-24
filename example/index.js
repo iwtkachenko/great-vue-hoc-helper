@@ -59,19 +59,19 @@ const Incrementor = () => combine({
 
 /**
  * Declare our component and wrap it with HOCs.
- * Notice that the component is just a function.
  */
-/* eslint-disable arrow-body-style */
 const MyComp = compose(
   // Set the initial value of property value to 3.
   Injector(3),
   // Increment the value property every 2 seconds.
   Incrementor(),
-  // Transform function into vue component.
-  combine())(
-  (h, { self }) => (<div>{self.value}</div>),
+)(
+  Vue.component({
+    render(h) {
+      return <div>{this.value}</div>;
+    },
+  }),
 );
-/* eslint-enable arrow-body-style */
 
 /* eslint-disable no-new */
 new Vue({ el: '#example-app', render: h => h('div', {}, [h(MyComp), h(MyComp)]) });

@@ -14,29 +14,29 @@ import assign from 'lodash.assign';
 /**
  * Types that are used in the module.
  */
-export interface RenderPayload {
+export interface RenderPayload<T> {
   com?: typeof Vue,
-  self: any,
-  props: any,
+  self: Vue,
+  props: T,
   others?: any,
-  children: any[],
+  children: Vue[],
   metadata?: any,
 }
 
-export interface Options {
+export interface Options<T> {
   // Inject props values into the child component
-  injectProps?: (props: any, self?: any, options?: Options, metadata?: any) => any,
+  injectProps?: (props: T, self?: Vue, options?: Options<T>, metadata?: any) => T,
   // Prepare vue vm render data object
-  prepareData?: (self: any, options?: Options) => any,
+  prepareData?: (self: Vue, options?: Options<T>) => any,
   /**
    * This property was missnamed and its support can be removed any time
    * @deprecated
    */
-  preapreData?: (self: any, options?: Options) => any,
+  preapreData?: (self: Vue, options?: Options<T>) => any,
   // Additional props definitions
-  props?: any,
+  props?: T,
   // If you want to render decorator rendere youself, you can use this property
-  render?: (h: any, payload?: RenderPayload) => any,
+  render?: (h: any, payload?: RenderPayload<T>) => any,
   // This object has to have shape of Vue component options
   options?: any,
   /**
@@ -50,13 +50,17 @@ export interface Options {
   metadata?: any,
 }
 
-export type RenderFunction = (h: any, payload?: RenderPayload) => any
+/**
+ * @deprecated It's better to use another module to create components
+ * from functions: https://github.com/vashigor/great-vue-func-com.
+ */
+export type RenderFunction<T> = (h: any, payload?: RenderPayload<T>) => any
 
 /**
  * Helper functions.
  */
 const metadata = {};
-export function castMetadata(self: any, options: Options): any {
+export function castMetadata<T>(self: Vue, options: Options<T>): any {
   /* eslint-disable no-underscore-dangle */
   if (metadata[self._uid]) {
     return { metadata: metadata[self._uid] };
@@ -74,25 +78,24 @@ export function castMetadata(self: any, options: Options): any {
   return {};
 }
 
-function destroyMetadata(self: any, options: Options) {
+export function destroyMetadata(self: Vue) {
   /* eslint-disable no-underscore-dangle */
-  if (options.metadata && metadata[self._uid]) {
+  if (metadata[self._uid]) {
     delete metadata[self._uid];
   }
   /* eslint-enable no-underscore-dangle */
 }
 
-function getPrepareOtherData(options: Options): (self: any) => any {
+function getPrepareOtherData<T>(options: Options<T>): (self: Vue) => any {
   const prepare = options.prepareData || options.preapreData;
-  return prepare ? (self: any) => prepare(self, options) : () => ({});
+  return prepare ? self => prepare(self, options) : () => ({});
 }
 
 /**
  * Module export.
  * Wrap function that simplifies HOC creation for VueJs.
- * It can be used to transform a render function in a fullscale component.
  */
-export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => {
+export default <T>(options: Options<T> = {}) => (com: typeof Vue | RenderFunction<T>) => {
   const injectedOptions = get(options, 'options', {});
 
   const mixins = [
@@ -103,13 +106,17 @@ export default (options: Options = {}) => (com: typeof Vue | RenderFunction) => 
       },
 
       destroyed() {
-        destroyMetadata(this, options);
+        destroyMetadata(this);
       },
     },
   ];
 
-  // We can transform some function to component instead of wrapping one.
   if (!(com.name || com.options)) {
+    console.warn(
+      'Despite this module supports conversion of functions to components ' +
+      'this functionality is deprecated and isn\'t developed.\n ' +
+      'Please, use the following module insead: ',
+    );
     return Vue.extend({
       ...injectedOptions,
 
