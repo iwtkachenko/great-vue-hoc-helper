@@ -45,7 +45,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 /**
  * @deprecated It's better to use another module to create components
- * from functions.
+ * from functions: https://github.com/vashigor/great-vue-func-com.
  */
 var metadata = {};
 function castMetadata(self, options) {
@@ -66,9 +66,9 @@ function castMetadata(self, options) {
   return {};
 }
 
-function destroyMetadata(self, options) {
+function destroyMetadata(self) {
   /* eslint-disable no-underscore-dangle */
-  if (options.metadata && metadata[self._uid]) {
+  if (metadata[self._uid]) {
     delete metadata[self._uid];
   }
   /* eslint-enable no-underscore-dangle */
@@ -98,7 +98,7 @@ exports.default = function () {
         this.$hocMetadata = castMetadata(this, options).metadata;
       },
       destroyed: function destroyed() {
-        destroyMetadata(this, options);
+        destroyMetadata(this);
       }
     }]);
 
