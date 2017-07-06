@@ -123,6 +123,9 @@ exports.default = function () {
     }
 
     // This is a dangerous dirty hack - we change props option of the decorated component.
+    if (com.options.props === undefined) {
+      com.options.props = {}; // eslint-disable-line no-param-reassign
+    }
     (0, _lodash4.default)(com.options.props, (0, _lodash2.default)(options, 'props', {}));
 
     // Get function that prepare other component data object parameters for rendering

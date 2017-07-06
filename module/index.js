@@ -95,84 +95,88 @@ function getPrepareOtherData<T>(options: Options<T>): (self: Vue) => any {
  * Module export.
  * Wrap function that simplifies HOC creation for VueJs.
  */
-export default <T>(options: Options<T> = {}) => (com: typeof Vue | RenderFunction<T>) => {
-  const injectedOptions = get(options, 'options', {});
+export default <T>(options: Options<T> = {}) =>
+  (com: typeof Vue | RenderFunction<T>): typeof Vue => {
+    const injectedOptions = get(options, 'options', {});
 
-  const mixins = [
-    ...(options.options && options.options.mixins ? options.options.mixins : []),
-    {
-      created() {
-        this.$hocMetadata = castMetadata(this, options).metadata;
+    const mixins = [
+      ...(options.options && options.options.mixins ? options.options.mixins : []),
+      {
+        created() {
+          this.$hocMetadata = castMetadata(this, options).metadata;
+        },
+
+        destroyed() {
+          destroyMetadata(this);
+        },
       },
+    ];
 
-      destroyed() {
-        destroyMetadata(this);
-      },
-    },
-  ];
+    if (!(com.name || com.options)) {
+      console.warn(
+        'Despite this module supports conversion of functions to components ' +
+        'this functionality is deprecated and isn\'t developed.\n ' +
+        'Please, use the following module insead: ',
+      );
+      return Vue.extend({
+        ...injectedOptions,
 
-  if (!(com.name || com.options)) {
-    console.warn(
-      'Despite this module supports conversion of functions to components ' +
-      'this functionality is deprecated and isn\'t developed.\n ' +
-      'Please, use the following module insead: ',
-    );
+        name: 'great-func-com',
+
+        props: options.props ? options.props : {},
+
+        mixins,
+
+        render(h) {
+          return com(h, {
+            props: this.$props,
+            children: this.$children,
+            self: this,
+            ...castMetadata(this, options),
+          });
+        },
+      });
+    }
+
+    // This is a dangerous dirty hack - we change props option of the decorated component.
+    if (com.options.props === undefined) {
+      com.options.props = {}; // eslint-disable-line no-param-reassign
+    }
+    assign(com.options.props, get(options, 'props', {}));
+
+    // Get function that prepare other component data object parameters for rendering
+    const prepare = getPrepareOtherData(options);
+
     return Vue.extend({
       ...injectedOptions,
 
-      name: 'great-func-com',
+      name: 'great-hoc',
 
-      props: options.props ? options.props : {},
+      props: com.options.props,
 
       mixins,
 
       render(h) {
-        return com(h, {
-          props: this.$props,
-          children: this.$children,
-          self: this,
-          ...castMetadata(this, options),
-        });
+        const hocMetadata = castMetadata(this, options).metadata || {};
+
+        // Generete prop value
+        const props = options.injectProps
+          ? options.injectProps(this.$props, this, options, hocMetadata)
+          : this.$props;
+
+        const others = prepare(this);
+        if (options.render) {
+          return options.render(h, {
+            com,
+            props,
+            children: this.$children,
+            self: this,
+            others,
+            metadata: hocMetadata,
+          });
+        }
+
+        return h(com, { props, ...others }, this.$children);
       },
     });
-  }
-
-  // This is a dangerous dirty hack - we change props option of the decorated component.
-  assign(com.options.props, get(options, 'props', {}));
-
-  // Get function that prepare other component data object parameters for rendering
-  const prepare = getPrepareOtherData(options);
-
-  return Vue.extend({
-    ...injectedOptions,
-
-    name: 'great-hoc',
-
-    props: com.options.props,
-
-    mixins,
-
-    render(h) {
-      const hocMetadata = castMetadata(this, options).metadata || {};
-
-      // Generete prop value
-      const props = options.injectProps
-        ? options.injectProps(this.$props, this, options, hocMetadata)
-        : this.$props;
-
-      const others = prepare(this);
-      if (options.render) {
-        return options.render(h, {
-          com,
-          props,
-          children: this.$children,
-          self: this,
-          others,
-          metadata: hocMetadata,
-        });
-      }
-
-      return h(com, { props, ...others }, this.$children);
-    },
-  });
-};
+  };

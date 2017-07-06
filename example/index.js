@@ -66,9 +66,9 @@ const MyComp = compose(
   // Increment the value property every 2 seconds.
   Incrementor(),
 )(
-  Vue.component({
+  Vue.extend({
     render(h) {
-      return <div>{this.value}</div>;
+      return <div>x{this.value}</div>;
     },
   }),
 );

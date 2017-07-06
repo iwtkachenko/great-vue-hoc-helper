@@ -43,7 +43,8 @@ This library is mostly useful when you use:
 ## Installation
 
 ```bash
-npm install --save great-vue-hoc-helper
+# npm 5+
+npm install great-vue-hoc-helper
 # or
 yarn add great-vue-hoc-helper
 ```
@@ -87,15 +88,15 @@ This is deprecated. Please use [this module](https://github.com/vashigor/great-v
 ### hoc-helper
 Signature of default import (helper itself)
 ```javascript
-(options: Options = {}) => (com: typeof Vue | RenderFunction) => typeof Vue
+<T>(options: Options<T> = {}) => (com: typeof Vue) => typeof Vue
 ```
 
 If you use metadata object, it is accessible in the HOC methods as `this.$hocMetadata`.
 
 ### Options
 ```javascript
-interface Options {
-	// Inject props values into the child component
+interface Options<T> {
+  // Inject props values into the child component
   injectProps?: (props: T, self?: Vue, options?: Options<T>, metadata?: any) => T,
   // Prepare vue vm render data object
   prepareData?: (self: Vue, options?: Options<T>) => any,
@@ -161,11 +162,11 @@ const Injector = value => combine({
   injectProps: props => ({ ...props, value }),
 });
 
-const MyComponent = compose(Injector(4), Component())(class extends Vue {
+const MyComponent = compose(Injector(4), Component())(Vue.extend({
   render(h) {
     reutrn <div>{this.value}</div>;
   }
-});
+}));
 ```
 
 ### HOC that injects some complex behavior
